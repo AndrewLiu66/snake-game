@@ -1,3 +1,3 @@
-# Glob Game
+# Gluttonous Snake Game
 
-Play it [here](http://twigg.gg/example-game/)!
+Feel free to play the Gluttonous Snake Game
