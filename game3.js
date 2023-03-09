@@ -75,9 +75,27 @@ function draw() {
 function pickLocation() {
     let cols = floor(width / scl);
     let rows = floor(height / scl);
-    food = createVector(floor(random(cols)), floor(random(rows)));
-    food.mult(scl);
+    let newLocation = createVector(floor(random(cols)), floor(random(rows)));
+    newLocation.mult(scl);
+
+    // Check for collision with obstacles
+    for (let i = 0; i < obstacles.length; i++) {
+        if (newLocation.equals(obstacles[i])) {
+            // Collision detected, generate new location
+            return pickLocation();
+        }
+    }
+
+    // Check for collision with food
+    if (newLocation.equals(food)) {
+        // Collision detected, generate new location
+        return pickLocation();
+    }
+
+    // No collision, use the new location
+    food = newLocation;
 }
+
 
 class Snake {
     constructor() {
@@ -134,14 +152,18 @@ class Snake {
 
     death(obstacles) {
         // Check if the snake's head goes off the screen
-        if (this.x < 0 || this.x + scl > width || this.y < 0 || this.y + scl > height) {
+        if (this.x < 0 || this.x + scl > width || this.y < 0 || this.y + scl > height)
+        {
+            console.log("game over1")
             this.gameOver();
         }
 
         // Check if the snake hits its tail
         for (let i = 0; i < this.tail.length; i++) {
             let d = dist(this.x, this.y, this.tail[i].x, this.tail[i].y);
-            if (d < 1) {
+            if (d < 1)
+            {
+                console.log("game over2")
                 this.gameOver();
             }
         }
@@ -149,7 +171,9 @@ class Snake {
         // Check if the snake hits an obstacle
         for (let i = 0; i < obstacles.length; i++) {
             let d = dist(this.x, this.y, obstacles[i].x, obstacles[i].y);
-            if (d < 1) {
+            if (d < 1)
+            {
+                console.log("game over3")
                 this.gameOver();
             }
         }
@@ -195,21 +219,35 @@ class Snake {
         // Generate a speed power-up at a random location on the canvas
         let x = floor(width / scl);
         let y = floor(height / scl);
-        this.powerup = createVector(floor(random(x)) * scl, floor(random(y)) * scl);
+
+        // Generate a random location and check if it collides with any obstacles
+        let collided = true;
+        while (collided) {
+          let powerupLocation = createVector(floor(random(x)) * scl, floor(random(y)) * scl);
+          collided = false;
+          for (let obstacle of obstacles) {
+            if (powerupLocation.equals(obstacle)) {
+              collided = true;
+              break;
+            }
+          }
+          if (!collided) {
+            this.powerup = powerupLocation;
+          }
+        }
 
         // Generate a random number between 0 and 1
         let randomNumber = Math.random();
         // Round the random number to the nearest integer (0 or 1)
         let randomZeroOrOne = Math.round(randomNumber);
-        if (randomZeroOrOne === 0)
-        {
-            this.powerupType = "speed";
-        } else if (randomZeroOrOne === 1)
-        {
-            this.powerupType = "longer";
+        if (randomZeroOrOne === 0) {
+          this.powerupType = "speed";
+        } else if (randomZeroOrOne === 1) {
+          this.powerupType = "longer";
         }
         console.log("generated power", this.powerupType)
     }
+
 
     removePowerup() {
         this.powerup = null;
