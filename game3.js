@@ -67,7 +67,7 @@ function draw() {
     rect(food.x, food.y, scl, scl);
     // Display the current score and high score in white text
     textSize(32);
-    fill(255);
+    fill(124, 14, 161);
     text("Your current score: " + score, 10, 40);
 }
 
@@ -165,10 +165,16 @@ class Snake {
         } else if (this.powerup !== null && dist(this.x, this.y, this.powerup.x, this.powerup.y) < (scl * 0.2) && this.powerupType === "speed") {
             this.applyPowerupEffect();
             return true;
+        } else if (this.powerup !== null && dist(this.x, this.y, this.powerup.x, this.powerup.y) < (scl * 0.2) && this.powerupType === "longer")
+        {
+            console.log("access longer", this.powerupType)
+            this.applyPowerupEffect();
+            return true;
         } else {
             return false;
         }
     }
+
 
     show() {
         // Draw snake segments and head
@@ -190,7 +196,19 @@ class Snake {
         let x = floor(width / scl);
         let y = floor(height / scl);
         this.powerup = createVector(floor(random(x)) * scl, floor(random(y)) * scl);
-        this.powerupType = "speed";
+
+        // Generate a random number between 0 and 1
+        let randomNumber = Math.random();
+        // Round the random number to the nearest integer (0 or 1)
+        let randomZeroOrOne = Math.round(randomNumber);
+        if (randomZeroOrOne === 0)
+        {
+            this.powerupType = "speed";
+        } else if (randomZeroOrOne === 1)
+        {
+            this.powerupType = "longer";
+        }
+        console.log("generated power", this.powerupType)
     }
 
     removePowerup() {
@@ -200,8 +218,15 @@ class Snake {
     }
 
     applyPowerupEffect() {
-        this.xSpeed *= 2;
-        this.ySpeed *= 2;
+        if (this.powerupType === "speed")
+        {
+            this.xSpeed *= 2;
+            this.ySpeed *= 2;
+        } else
+        {
+            score += 5
+            snake.update();
+        }
         this.removePowerup();
     }
 
